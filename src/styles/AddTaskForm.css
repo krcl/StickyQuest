@@ -1,0 +1,96 @@
+.add-task-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.add-task-row {
+  display: flex;
+  gap: 0.6rem;
+  align-items: stretch;
+  flex-wrap: wrap;
+}
+
+.add-task-row input[type='text'] {
+  flex: 1;
+  min-width: 140px;
+  background: #1e1a10;
+  border: 1px solid #5a4a2a;
+  border-radius: 4px;
+  color: #f0d890;
+  font-size: 0.95rem;
+  padding: 0.55rem 0.85rem;
+  outline: none;
+  font-family: inherit;
+  transition: border-color 0.15s;
+}
+
+.add-task-row input[type='text']::placeholder {
+  color: #5a4a30;
+}
+
+.add-task-row input[type='text']:focus {
+  border-color: #c8a040;
+}
+
+.add-task-form textarea {
+  width: 100%;
+  background: #1e1a10;
+  border: 1px solid #5a4a2a;
+  border-radius: 4px;
+  color: #f0d890;
+  font-size: 0.85rem;
+  padding: 0.5rem 0.85rem;
+  outline: none;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 48px;
+  transition: border-color 0.15s;
+}
+
+.add-task-form textarea::placeholder {
+  color: #5a4a30;
+}
+
+.add-task-form textarea:focus {
+  border-color: #c8a040;
+}
+
+.add-task-row select {
+  background: #1e1a10;
+  border: 1px solid #5a4a2a;
+  border-radius: 4px;
+  color: #c8a040;
+  font-size: 0.9rem;
+  padding: 0.55rem 0.6rem;
+  outline: none;
+  cursor: pointer;
+  font-family: inherit;
+  transition: border-color 0.15s;
+}
+
+.add-task-row select:focus {
+  border-color: #c8a040;
+}
+
+.add-task-row button[type='submit'] {
+  background: #c8a040;
+  color: #1a1000;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  padding: 0.55rem 1.2rem;
+  cursor: pointer;
+  font-family: inherit;
+  letter-spacing: 0.04em;
+  transition: background 0.15s, transform 0.1s;
+}
+
+.add-task-form button[type='submit']:hover {
+  background: #e0b84a;
+}
+
+.add-task-form button[type='submit']:active {
+  transform: scale(0.97);
+}
