@@ -31,7 +31,7 @@ export default function App() {
   const [quests, setQuests]     = useState(loadQuests);
   const [history, setHistory]   = useState(loadHistory);
   const [expanded, setExpanded] = useState(false);
-  const notifiedRef = useRef(new Set());
+  const notifiedRef = useRef(new Set(JSON.parse(localStorage.getItem('stickyquest_notified') || '[]')));
 
   useEffect(() => { localStorage.setItem(STORAGE_KEY, JSON.stringify(quests)); }, [quests]);
   useEffect(() => { localStorage.setItem(HISTORY_KEY, JSON.stringify(history)); }, [history]);
@@ -56,22 +56,35 @@ export default function App() {
       if (!permitted) return;
 
       const now = Date.now();
+      let changed = false;
+
       for (const quest of quests) {
         if (!quest.deadline) continue;
         const ms = new Date(quest.deadline).getTime();
         const diff = ms - now;
         const keySoon = `${quest.id}:soon`;
         const keyDue  = `${quest.id}:due`;
+
         if (diff > 0 && diff <= 30 * 60_000 && !notifiedRef.current.has(keySoon)) {
           notifiedRef.current.add(keySoon);
-          await sendNotification({ title: 'Quest Expiring Soon!',
-            body: `"${quest.quest_title}" is due in less than 30 minutes!` });
+          changed = true;
+          try {
+            await sendNotification({ title: 'Quest Expiring Soon!',
+              body: `"${quest.quest_title}" is due in less than 30 minutes!` });
+          } catch (e) { console.error('Notification failed:', e); }
         }
-        if (diff <= 0 && diff > -60_000 && !notifiedRef.current.has(keyDue)) {
+        if (diff <= 0 && !notifiedRef.current.has(keyDue)) {
           notifiedRef.current.add(keyDue);
-          await sendNotification({ title: 'Quest Overdue!',
-            body: `"${quest.quest_title}" deadline has passed!` });
+          changed = true;
+          try {
+            await sendNotification({ title: 'Quest Overdue!',
+              body: `"${quest.quest_title}" deadline has passed!` });
+          } catch (e) { console.error('Notification failed:', e); }
         }
+      }
+
+      if (changed) {
+        localStorage.setItem('stickyquest_notified', JSON.stringify([...notifiedRef.current]));
       }
     }
     checkDeadlines();
