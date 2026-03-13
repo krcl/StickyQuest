@@ -47,7 +47,7 @@ function buildQuestDescription(task) {
   return `A task awaits — ${reworded}. See it through.`;
 }
 
-export function transformTask(rawTask, urgencyOverride = 'auto', notes = '') {
+export function transformTask(rawTask, urgencyOverride = 'auto', notes = '', deadline = null) {
   const task = rawTask.trim();
 
   const urgency_level =
@@ -60,6 +60,7 @@ export function transformTask(rawTask, urgencyOverride = 'auto', notes = '') {
     objective: task,
     notes: notes.trim(),
     urgency_level,
+    deadline,
     completed: false,
     createdAt: new Date().toISOString(),
   };

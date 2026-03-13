@@ -144,6 +144,12 @@
   white-space: pre-wrap;
 }
 
+/* ─── Deadline ────────────────────────────────────── */
+.quest-deadline { font-size: 0.7rem; padding-top: 0.4rem; border-top: 1px solid #3a3020; }
+.deadline--ok      { color: #7a9870; }
+.deadline--warn    { color: #ffe066; }
+.deadline--overdue { color: #ff6666; }
+
 /* ─── Completed indicator ─────────────────────────── */
 .quest-complete-indicator {
   font-size: 0.7rem;

@@ -5,15 +5,17 @@ export default function AddTaskForm({ onAdd }) {
   const [task, setTask] = useState('');
   const [notes, setNotes] = useState('');
   const [urgency, setUrgency] = useState('auto');
+  const [deadline, setDeadline] = useState('');
 
   function handleSubmit(e) {
     e.preventDefault();
     const trimmed = task.trim();
     if (!trimmed) return;
-    onAdd(trimmed, urgency, notes.trim());
+    onAdd(trimmed, urgency, notes.trim(), deadline ? deadline : null);
     setTask('');
     setNotes('');
     setUrgency('auto');
+    setDeadline('');
   }
 
   return (
@@ -45,6 +47,13 @@ export default function AddTaskForm({ onAdd }) {
         placeholder="Notes (optional)..."
         aria-label="Quest notes"
         rows={2}
+      />
+      <input
+        type="datetime-local"
+        className="deadline-input"
+        value={deadline}
+        onChange={(e) => setDeadline(e.target.value)}
+        aria-label="Quest deadline"
       />
     </form>
   );

@@ -7,8 +7,21 @@ const URGENCY_LABELS = {
   low:    'Low Priority',
 };
 
+function getDeadlineClass(deadline) {
+  const diff = new Date(deadline).getTime() - Date.now();
+  if (diff <= 0) return 'deadline--overdue';
+  if (diff <= 24 * 60 * 60_000) return 'deadline--warn';
+  return 'deadline--ok';
+}
+
+function formatDeadline(deadline) {
+  return new Date(deadline).toLocaleString(undefined, {
+    month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit',
+  });
+}
+
 export default function QuestCard({ quest, onToggle }) {
-  const { quest_title, quest_description, objective, notes, urgency_level, completed } = quest;
+  const { quest_title, quest_description, objective, notes, urgency_level, completed, deadline } = quest;
   const [collapsed, setCollapsed] = useState(false);
 
   function handleCollapseToggle(e) {
@@ -47,6 +60,11 @@ export default function QuestCard({ quest, onToggle }) {
           <span>Objective: </span>{objective}
         </p>
         {notes && <p className="quest-notes">{notes}</p>}
+        {deadline && (
+          <p className={`quest-deadline ${getDeadlineClass(deadline)}`}>
+            Due: {formatDeadline(deadline)}
+          </p>
+        )}
         {completed && <div className="quest-complete-indicator">&#10003; Completed</div>}
       </div>
     </div>

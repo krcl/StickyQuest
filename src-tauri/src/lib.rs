@@ -19,6 +19,7 @@ fn toggle_window(app: &AppHandle) {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_notification::init())
         .plugin(
             tauri_plugin_global_shortcut::Builder::new()
                 .with_handler(|app, _shortcut, event| {
@@ -44,7 +45,7 @@ pub fn run() {
             let menu = Menu::with_items(app, &[&show_hide, &quit])?;
 
             TrayIconBuilder::new()
-                .icon(app.default_window_icon().cloned().expect("app icon missing"))
+                .icon(tauri::include_image!("icons/tray-icon.png"))
                 .menu(&menu)
                 .on_menu_event(|app, event| match event.id.as_ref() {
                     "toggle" => toggle_window(app),

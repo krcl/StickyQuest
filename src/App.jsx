@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { getCurrentWindow } from '@tauri-apps/api/window';
 import { LogicalSize } from '@tauri-apps/api/dpi';
 import QuestBoard from './components/QuestBoard';
 import AddTaskForm from './components/AddTaskForm';
 import CompletedLog from './components/CompletedLog';
 import { transformTask } from './utils/questTransformer';
+import { sendNotification } from '@tauri-apps/plugin-notification';
 import './styles/App.css';
 
 const STORAGE_KEY = 'stickyquest_quests';
@@ -30,6 +31,7 @@ export default function App() {
   const [quests, setQuests]     = useState(loadQuests);
   const [history, setHistory]   = useState(loadHistory);
   const [expanded, setExpanded] = useState(false);
+  const notifiedRef = useRef(new Set());
 
   useEffect(() => { localStorage.setItem(STORAGE_KEY, JSON.stringify(quests)); }, [quests]);
   useEffect(() => { localStorage.setItem(HISTORY_KEY, JSON.stringify(history)); }, [history]);
@@ -44,8 +46,34 @@ export default function App() {
     setExpanded(false);
   }
 
-  function handleAddTask(rawTask, urgencyOverride, notes) {
-    const quest = transformTask(rawTask, urgencyOverride, notes);
+  useEffect(() => {
+    async function checkDeadlines() {
+      const now = Date.now();
+      for (const quest of quests) {
+        if (!quest.deadline) continue;
+        const ms = new Date(quest.deadline).getTime();
+        const diff = ms - now;
+        const keySoon = `${quest.id}:soon`;
+        const keyDue  = `${quest.id}:due`;
+        if (diff > 0 && diff <= 30 * 60_000 && !notifiedRef.current.has(keySoon)) {
+          notifiedRef.current.add(keySoon);
+          await sendNotification({ title: 'Quest Expiring Soon!',
+            body: `"${quest.quest_title}" is due in less than 30 minutes!` });
+        }
+        if (diff <= 0 && diff > -60_000 && !notifiedRef.current.has(keyDue)) {
+          notifiedRef.current.add(keyDue);
+          await sendNotification({ title: 'Quest Overdue!',
+            body: `"${quest.quest_title}" deadline has passed!` });
+        }
+      }
+    }
+    checkDeadlines();
+    const id = setInterval(checkDeadlines, 60_000);
+    return () => clearInterval(id);
+  }, [quests]);
+
+  function handleAddTask(rawTask, urgencyOverride, notes, deadline) {
+    const quest = transformTask(rawTask, urgencyOverride, notes, deadline);
     setQuests((prev) => [quest, ...prev]);
   }
 
