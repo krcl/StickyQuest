@@ -5,7 +5,7 @@ import QuestBoard from './components/QuestBoard';
 import AddTaskForm from './components/AddTaskForm';
 import CompletedLog from './components/CompletedLog';
 import { transformTask } from './utils/questTransformer';
-import { sendNotification } from '@tauri-apps/plugin-notification';
+import { sendNotification, isPermissionGranted, requestPermission } from '@tauri-apps/plugin-notification';
 import './styles/App.css';
 
 const STORAGE_KEY = 'stickyquest_quests';
@@ -48,6 +48,13 @@ export default function App() {
 
   useEffect(() => {
     async function checkDeadlines() {
+      let permitted = await isPermissionGranted();
+      if (!permitted) {
+        const result = await requestPermission();
+        permitted = result === 'granted';
+      }
+      if (!permitted) return;
+
       const now = Date.now();
       for (const quest of quests) {
         if (!quest.deadline) continue;
