@@ -1,0 +1,2 @@
+// Windows resource file — embeds the app icon into the exe
+IDI_ICON1 ICON "icons/icon.ico"
