@@ -5,7 +5,7 @@ import QuestBoard from './components/QuestBoard';
 import AddTaskForm from './components/AddTaskForm';
 import CompletedLog from './components/CompletedLog';
 import { transformTask } from './utils/questTransformer';
-import { sendNotification, isPermissionGranted, requestPermission } from '@tauri-apps/plugin-notification';
+import { invoke } from '@tauri-apps/api/core';
 import './styles/App.css';
 
 const STORAGE_KEY = 'stickyquest_quests';
@@ -48,13 +48,6 @@ export default function App() {
 
   useEffect(() => {
     async function checkDeadlines() {
-      let permitted = await isPermissionGranted();
-      if (!permitted) {
-        const result = await requestPermission();
-        permitted = result === 'granted';
-      }
-      if (!permitted) return;
-
       const now = Date.now();
       let changed = false;
 
@@ -69,16 +62,20 @@ export default function App() {
           notifiedRef.current.add(keySoon);
           changed = true;
           try {
-            await sendNotification({ title: 'Quest Expiring Soon!',
-              body: `"${quest.quest_title}" is due in less than 30 minutes!` });
+            await invoke('show_notification', {
+              title: 'Quest Expiring Soon!',
+              body: `"${quest.quest_title}" is due in less than 30 minutes!`,
+            });
           } catch (e) { console.error('Notification failed:', e); }
         }
         if (diff <= 0 && !notifiedRef.current.has(keyDue)) {
           notifiedRef.current.add(keyDue);
           changed = true;
           try {
-            await sendNotification({ title: 'Quest Overdue!',
-              body: `"${quest.quest_title}" deadline has passed!` });
+            await invoke('show_notification', {
+              title: 'Quest Overdue!',
+              body: `"${quest.quest_title}" deadline has passed!`,
+            });
           } catch (e) { console.error('Notification failed:', e); }
         }
       }
