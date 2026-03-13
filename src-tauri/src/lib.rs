@@ -38,6 +38,11 @@ pub fn run() {
                 )?;
             }
 
+            // Window icon (taskbar / alt-tab)
+            if let Some(window) = app.get_webview_window("main") {
+                let _ = window.set_icon(tauri::include_image!("icons/icon.png"));
+            }
+
             // System tray
             let show_hide =
                 MenuItem::with_id(app, "toggle", "Show / Hide", true, None::<&str>)?;
